@@ -7,12 +7,14 @@ package com.example.guest.discussionforum.models;
 public class Message {
     String title;
     String content;
+    String category;
 
     public Message() { }
 
-    public Message(String title, String content) {
+    public Message(String title, String content, String category) {
         this.title = title;
         this.content = content;
+        this.category = category;
     }
 
     public String getTitle() {
@@ -21,5 +23,9 @@ public class Message {
 
     public String getContent() {
         return this.content;
+    }
+
+    public String getCategory() {
+        return this.category;
     }
 }
