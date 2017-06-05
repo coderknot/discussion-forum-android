@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 for(DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
                     String categoriesName = areaSnapshot.child("name").getValue(String.class);
+                    String categoryKey = areaSnapshot.getKey();
                     categories.add(categoriesName);
                 }
 
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == mCreateMessage) {
             String title = mTitle.getText().toString();
             String content = mContent.getText().toString();
-            String category = mCategorySpinner.toString();
+            String category = mCategorySpinner.getSelectedItem().toString();
 
             Message message = new Message(title, content, category);
             saveMessageToFirebase(message);
