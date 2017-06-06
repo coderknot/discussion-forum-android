@@ -1,9 +1,8 @@
 package com.example.guest.discussionforum.models;
 
-/**
- * Created by Guest on 6/5/17.
- */
+import org.parceler.Parcel;
 
+@Parcel
 public class Message {
     String title;
     String content;

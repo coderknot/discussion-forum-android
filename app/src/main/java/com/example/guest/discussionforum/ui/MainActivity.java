@@ -61,29 +61,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mViewMessages.setOnClickListener(this);
         mViewCategories.setOnClickListener(this);
 
-//        mMessagesReferenceListener = mMessagesReference.child("categories").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                final List<Category> categories = new ArrayList<Category>();
-//
-//                for(DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-//                    Category category = areaSnapshot.child("name").getValue(Category.class);
-//                    String categoryKey = areaSnapshot.getKey();
-//                    categories.add(category);
-//                }
-//
-//                Spinner categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
-//                ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
-//                categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//                categorySpinner.setAdapter(categoriesAdapter);
-//            }
-//
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//
-//            }
-//        });
-
         mMessagesReferenceListener = mMessagesReference.child("categories").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -93,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     String categoryName = areaSnapshot.child("name").getValue(String.class);
                     String categoryKey = areaSnapshot.getKey();
                     Category category = new Category(categoryName, categoryKey);
-                    Log.d("What is this?", categoryKey.toString());
                     categories.add(category);
                 }
 
@@ -128,9 +104,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == mCreateMessage) {
             String title = mTitle.getText().toString();
             String content = mContent.getText().toString();
-//            String category = mCategorySpinner.getSelectedItem().toString();
-//            Log.d("category spinner", mCategorySpinner.);
-
 
             Message message = new Message(title, content, selectedCategoryKey);
             saveMessageToFirebase(message);
@@ -143,7 +116,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == mViewCategories) {
             Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
             startActivity(intent);
-//            Toast.makeText(MainActivity.this, "View Catergories Button clicked!", Toast.LENGTH_SHORT).show();
         }
     }
 
