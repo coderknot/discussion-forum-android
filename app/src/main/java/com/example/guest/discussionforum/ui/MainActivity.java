@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +15,8 @@ import android.widget.Toast;
 import com.example.guest.discussionforum.Constants;
 import com.example.guest.discussionforum.MessageListActivity;
 import com.example.guest.discussionforum.R;
+import com.example.guest.discussionforum.adapters.CategoriesAdapter;
+import com.example.guest.discussionforum.models.Category;
 import com.example.guest.discussionforum.models.Message;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,7 +24,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.security.Key;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import butterknife.Bind;
@@ -30,6 +35,8 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     private DatabaseReference mMessagesReference;
     private ValueEventListener mMessagesReferenceListener;
+    private CategoriesAdapter mCategoriesAdapter;
+    private String selectedCategoryKey;
 
     @Bind(R.id.createMessage) Button mCreateMessage;
     @Bind(R.id.viewMessages) Button mViewMessages;
@@ -54,21 +61,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mViewMessages.setOnClickListener(this);
         mViewCategories.setOnClickListener(this);
 
+//        mMessagesReferenceListener = mMessagesReference.child("categories").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                final List<Category> categories = new ArrayList<Category>();
+//
+//                for(DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
+//                    Category category = areaSnapshot.child("name").getValue(Category.class);
+//                    String categoryKey = areaSnapshot.getKey();
+//                    categories.add(category);
+//                }
+//
+//                Spinner categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
+//                ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
+//                categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//                categorySpinner.setAdapter(categoriesAdapter);
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//
+//            }
+//        });
+
         mMessagesReferenceListener = mMessagesReference.child("categories").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                final List<String> categories = new ArrayList<String>();
+                final ArrayList<Category> categories = new ArrayList<Category>();
 
                 for(DataSnapshot areaSnapshot : dataSnapshot.getChildren()) {
-                    String categoriesName = areaSnapshot.child("name").getValue(String.class);
+                    String categoryName = areaSnapshot.child("name").getValue(String.class);
                     String categoryKey = areaSnapshot.getKey();
-                    categories.add(categoriesName);
+                    Category category = new Category(categoryName, categoryKey);
+                    Log.d("What is this?", categoryKey.toString());
+                    categories.add(category);
                 }
 
                 Spinner categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
-                ArrayAdapter<String> categoriesAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, categories);
-                categoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                categorySpinner.setAdapter(categoriesAdapter);
+                mCategoriesAdapter = new CategoriesAdapter(MainActivity.this, android.R.layout.simple_spinner_item, categories);
+                mCategoriesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                categorySpinner.setAdapter(mCategoriesAdapter);
+
+                categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        selectedCategoryKey = categories.get(i).getId();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+
+                    }
+                });
             }
 
             @Override
@@ -76,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
+
     }
 
     @Override
@@ -83,9 +128,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(v == mCreateMessage) {
             String title = mTitle.getText().toString();
             String content = mContent.getText().toString();
-            String category = mCategorySpinner.getSelectedItem().toString();
+//            String category = mCategorySpinner.getSelectedItem().toString();
+//            Log.d("category spinner", mCategorySpinner.);
 
-            Message message = new Message(title, content, category);
+
+            Message message = new Message(title, content, selectedCategoryKey);
             saveMessageToFirebase(message);
             Toast.makeText(MainActivity.this, "Message Saved", Toast.LENGTH_SHORT).show();
         }
@@ -94,7 +141,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         }
         if(v == mViewCategories) {
-            Toast.makeText(MainActivity.this, "View Catergories Button clicked!", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(MainActivity.this, CategoryActivity.class);
+            startActivity(intent);
+//            Toast.makeText(MainActivity.this, "View Catergories Button clicked!", Toast.LENGTH_SHORT).show();
         }
     }
 

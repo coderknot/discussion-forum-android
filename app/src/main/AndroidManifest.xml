@@ -23,6 +23,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.guest.discussionforum.ui.MainActivity" />
         </activity>
+        <activity android:name=".ui.CategoryActivity"></activity>
     </application>
 
 </manifest>
